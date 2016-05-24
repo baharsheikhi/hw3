@@ -175,6 +175,22 @@ public class GenericStandardDeckGame implements GenericCardGameModel<StandardCar
             && queenCount == 4 && kingCount == 4 && aceCount == 4;
   }
 
+  /**
+   *Gets the players of this generic standard deck game
+   * @return the list of players of this class
+     */
+  protected List<Player> getPlayers() {
+    return this.players;
+  }
+
+  /**
+   * Gets the deck of this generic standard deck game
+   * @return the deck of this game
+     */
+  protected List<StandardCard> getCards() {
+    return this.deck;
+  }
+
 
   /**
    * creates a generic standard deck game with a given number of players. gets the deck and then
