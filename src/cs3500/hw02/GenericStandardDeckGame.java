@@ -248,3 +248,7 @@ public class GenericStandardDeckGame implements GenericCardGameModel<StandardCar
   }
 
 }
+
+
+//changed the constructor so the cards were not dealt upon creation
+//should our tests on genericStandardCardGame be resubmitted?

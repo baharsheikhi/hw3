@@ -1,8 +1,15 @@
+import com.sun.xml.internal.bind.api.impl.NameConverter;
+
 import org.junit.Test;
 
+import cs3500.hw02.Rank;
+import cs3500.hw02.StandardCard;
+import cs3500.hw02.Suit;
 import cs3500.hw03.WhistModel;
 
 import static org.junit.Assert.*;
+
+import java.util.*;
 
 /**
  * Created by bahar on 5/23/16.
@@ -12,6 +19,7 @@ public class WhistModelTest {
 
   //imagine this is a game with 4 players and each player has 13 cards in their hands
   WhistModel model1 = new WhistModel();
+  //imagine this is a game with 3 players and player 1 has 18 cards, 2 and 3 have 17
 
   @Test(expected = IllegalArgumentException.class)
   public void playExceptions() {
@@ -117,7 +125,7 @@ public class WhistModelTest {
   }
 
   @Test
-  public void getCurrentPlayer() {
+  public void simpleGameTest() {
     assertFalse(model1.isGameOver());
     //should always start with 0
     assertEquals(0, model1.getCurrentPlayer());
@@ -199,21 +207,91 @@ public class WhistModelTest {
 
     assertFalse(model1.isGameOver());
     model1.play(0, 0); //1 card left
+    //throws an exception because it is not model1's turn
+    try {
+      model1.play(0, 0);
+    }
+    catch (IllegalArgumentException e) {
+      this.playExceptions();
+    }
     assertFalse(model1.isGameOver());
     model1.play(1, 0); //1 card left
     assertFalse(model1.isGameOver());
     model1.play(2, 0); //1 card left
+    assertFalse(model1.isGameOver());
+    model1.play(3, 0);
     assertTrue(model1.isGameOver());
+    //is this hairy, calling play after the game is over?
+    //should throw an exception if you're trying to move once the game is over
+    try {
+      model1.play(0, 0);
+    }
+    catch (IllegalArgumentException e) {
+      this.playExceptions();
+    }
 
+    //throws an exception because the game is over
     try {
       model1.getCurrentPlayer();
     }
     catch (IllegalArgumentException e) {
       this.getCurrentPlayerExceptions();
     }
-    //TODO SHOULD THROW AN EXCEPTION HERE, TRY CATCH? model1.play(3, 0);
   }
 
+  @Test
+  public void testSkipPlayerPlay() {
+    List<StandardCard> shortList = new ArrayList<StandardCard>();
+    //X
+    shortList.add(new StandardCard(Suit.Hearts, Rank.Two));
+    //Y
+    shortList.add(new StandardCard(Suit.Hearts, Rank.Three));
+    //Z
+    shortList.add(new StandardCard(Suit.Hearts, Rank.Five));
+    //A
+    shortList.add(new StandardCard(Suit.Spades, Rank.Two));
+    //B
+    shortList.add(new StandardCard(Suit.Spades, Rank.Three));
+    //C
+    shortList.add(new StandardCard(Suit.Spades, Rank.Five));
+    //D
+    shortList.add(new StandardCard(Suit.Diamonds, Rank.Two));
+    //E
+    shortList.add(new StandardCard(Suit.Diamonds, Rank.Ace));
+    //F
+    shortList.add(new StandardCard(Suit.Diamonds, Rank.Three));
+    //G
+    shortList.add(new StandardCard(Suit.Clubs, Rank.Two));
+    //H
+    shortList.add(new StandardCard(Suit.Clubs, Rank.Ace));
+
+    WhistModel modelSkip = null;
+    try {
+      modelSkip = new WhistModel(shortList, 3);
+    } catch (IllegalArgumentException e) {
+      modelSkip.play(0, 2);
+      modelSkip.play(0, 0);
+      modelSkip.play(0, 1);
+      //player 3 should win here
+      modelSkip.play(0, 2);
+      modelSkip.play(0, 0);
+      modelSkip.play(0, 1);
+      //player 3 should win again
+      modelSkip.play(0, 2);
+      modelSkip.play(0, 0);
+      modelSkip.play(0, 1);
+      //player 2 should win here
+      //because player 1 does not have any more cards
+      modelSkip.play(0, 1);
+      try {
+        modelSkip.play(0, 0);
+      } catch (IllegalArgumentException f) {
+        this.playExceptions();
+      }
+      modelSkip.play(0, 2);
+      assertTrue(modelSkip.isGameOver());
+    }
+  }
 
   @Test
   public void isGameOver() {

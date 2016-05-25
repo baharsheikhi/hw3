@@ -35,4 +35,25 @@ public enum Suit {
   public int compareSuits(Suit s) {
     return this.ordinal() - s.ordinal();
   }
+
+  public static Suit getSuit(String s) {
+    if (s.contains("♥")) {
+      return Hearts;
+    }
+    else if (s.contains("♠")) {
+      return Spades;
+    }
+
+    else if (s.contains("♦")) {
+      return Diamonds;
+    }
+
+    else if (s.contains("♣")) {
+      return Clubs;
+    }
+
+    else {
+      throw new IllegalArgumentException("Please enter a valid Suit");
+    }
+  }
 }
