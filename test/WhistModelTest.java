@@ -1,5 +1,3 @@
-import com.sun.xml.internal.bind.api.impl.NameConverter;
-
 import org.junit.Test;
 
 import cs3500.hw02.Rank;
@@ -18,18 +16,92 @@ import java.util.*;
 public class WhistModelTest {
 
   //imagine this is a game with 4 players and each player has 13 cards in their hands
-  WhistModel model1 = new WhistModel();
-  //imagine this is a game with 3 players and player 1 has 18 cards, 2 and 3 have 17
+  List<StandardCard> player1Wins;
+    WhistModel model1;
+    WhistModel modelSkip;
+
+
+    public void initData() {
+        this.player1Wins = new ArrayList<>();
+        //player 1 should win this round because it has the highest rank
+        this.player1Wins.add(new StandardCard(Suit.Clubs, Rank.Ace));
+        this.player1Wins.add(new StandardCard(Suit.Clubs, Rank.King));
+        this.player1Wins.add(new StandardCard(Suit.Clubs, Rank.Queen));
+        this.player1Wins.add(new StandardCard(Suit.Clubs, Rank.Jack));
+
+        //Player 1 should win this round because it has the correct suit
+        this.player1Wins.add(new StandardCard(Suit.Clubs, Rank.Ten));
+        this.player1Wins.add(new StandardCard(Suit.Diamonds, Rank.Ten));
+        this.player1Wins.add(new StandardCard(Suit.Hearts, Rank.Ten));
+        this.player1Wins.add(new StandardCard(Suit.Spades, Rank.Ten));
+
+        this.player1Wins.add(new StandardCard(Suit.Diamonds, Rank.Ace));
+        this.player1Wins.add(new StandardCard(Suit.Diamonds, Rank.King));
+        this.player1Wins.add(new StandardCard(Suit.Diamonds, Rank.Queen));
+        this.player1Wins.add(new StandardCard(Suit.Diamonds, Rank.Jack));
+
+        this.player1Wins.add(new StandardCard(Suit.Hearts, Rank.Ace));
+        this.player1Wins.add(new StandardCard(Suit.Hearts, Rank.King));
+        this.player1Wins.add(new StandardCard(Suit.Hearts, Rank.Queen));
+        this.player1Wins.add(new StandardCard(Suit.Hearts, Rank.Jack));
+
+        this.player1Wins.add(new StandardCard(Suit.Spades, Rank.Ace));
+        this.player1Wins.add(new StandardCard(Suit.Spades, Rank.King));
+        this.player1Wins.add(new StandardCard(Suit.Spades, Rank.Queen));
+        this.player1Wins.add(new StandardCard(Suit.Spades, Rank.Jack));
+
+        this.player1Wins.add(new StandardCard(Suit.Clubs, Rank.Nine));
+        this.player1Wins.add(new StandardCard(Suit.Diamonds, Rank.Nine));
+        this.player1Wins.add(new StandardCard(Suit.Hearts, Rank.Nine));
+        this.player1Wins.add(new StandardCard(Suit.Spades, Rank.Nine));
+
+        this.player1Wins.add(new StandardCard(Suit.Clubs, Rank.Eight));
+        this.player1Wins.add(new StandardCard(Suit.Diamonds, Rank.Eight));
+        this.player1Wins.add(new StandardCard(Suit.Hearts, Rank.Eight));
+        this.player1Wins.add(new StandardCard(Suit.Spades, Rank.Eight));
+
+        this.player1Wins.add(new StandardCard(Suit.Clubs, Rank.Seven));
+        this.player1Wins.add(new StandardCard(Suit.Diamonds, Rank.Seven));
+        this.player1Wins.add(new StandardCard(Suit.Hearts, Rank.Seven));
+        this.player1Wins.add(new StandardCard(Suit.Spades, Rank.Seven));
+
+        this.player1Wins.add(new StandardCard(Suit.Clubs, Rank.Six));
+        this.player1Wins.add(new StandardCard(Suit.Diamonds, Rank.Six));
+        this.player1Wins.add(new StandardCard(Suit.Hearts, Rank.Six));
+        this.player1Wins.add(new StandardCard(Suit.Spades, Rank.Six));
+
+        this.player1Wins.add(new StandardCard(Suit.Clubs, Rank.Five));
+        this.player1Wins.add(new StandardCard(Suit.Diamonds, Rank.Five));
+        this.player1Wins.add(new StandardCard(Suit.Hearts, Rank.Five));
+        this.player1Wins.add(new StandardCard(Suit.Spades, Rank.Five));
+
+        this.player1Wins.add(new StandardCard(Suit.Clubs, Rank.Four));
+        this.player1Wins.add(new StandardCard(Suit.Diamonds, Rank.Four));
+        this.player1Wins.add(new StandardCard(Suit.Hearts, Rank.Four));
+        this.player1Wins.add(new StandardCard(Suit.Spades, Rank.Four));
+
+        this.player1Wins.add(new StandardCard(Suit.Clubs, Rank.Three));
+        this.player1Wins.add(new StandardCard(Suit.Diamonds, Rank.Three));
+        this.player1Wins.add(new StandardCard(Suit.Hearts, Rank.Three));
+        this.player1Wins.add(new StandardCard(Suit.Spades, Rank.Three));
+
+        this.player1Wins.add(new StandardCard(Suit.Clubs, Rank.Two));
+        this.player1Wins.add(new StandardCard(Suit.Diamonds, Rank.Two));
+        this.player1Wins.add(new StandardCard(Suit.Hearts, Rank.Two));
+        this.player1Wins.add(new StandardCard(Suit.Spades, Rank.Two));
+
+        this.model1 = new WhistModel(this.player1Wins, 4);
+
+    }
 
   @Test(expected = IllegalArgumentException.class)
   public void playExceptions() {
-    model1.play(4, 0);
-    model1.play(0, 13);
-    model1.play(5, 17);
   }
 
   @Test
   public void testPlay() {
+      this.initData();
+
     String before = model1.getGameState();
     String [] beforeSplitByPlayer = before.split("player");
 
@@ -126,25 +198,31 @@ public class WhistModelTest {
 
   @Test
   public void simpleGameTest() {
+      this.initData();
+
     assertFalse(model1.isGameOver());
     //should always start with 0
     assertEquals(0, model1.getCurrentPlayer());
     //the first player moves : 12 cards left
     model1.play(0, 0);
+    assertFalse(model1.isGameOver());
     //now it is the second player's turn
     assertEquals(1, model1.getCurrentPlayer());
     //the second player moves: 12 cards left
     model1.play(1, 0);
+      assertFalse(model1.isGameOver());
     //now it is the third player's turn
     assertEquals(2, model1.getCurrentPlayer());
     //the third player moves: 13 cards left
     model1.play(2, 0);
+      assertFalse(model1.isGameOver());
     //now it is the fourth player's turn
     assertEquals(3, model1.getCurrentPlayer());
     //the fourth player moves
     model1.play(3, 0);
+      assertFalse(model1.isGameOver());
     //IMPORTANT: NOW IT IS THE FIRST PLAYER'S TURN AGAIN
-    assertEquals(0, model1.getCurrentPlayer());
+      assertEquals(0, model1.getCurrentPlayer());
     assertFalse(model1.isGameOver());
     model1.play(0, 0); // 11 cards left
     model1.play(1, 0);
@@ -159,7 +237,7 @@ public class WhistModelTest {
 
     assertFalse(model1.isGameOver());
     model1.play(0, 0); //9 cards left
-    model1.play(1, 0);
+       model1.play(1, 0);
     model1.play(2, 0);
     model1.play(3, 0);
 
@@ -179,7 +257,7 @@ public class WhistModelTest {
     model1.play(0, 0); //6 cards left
     model1.play(1, 0);
     model1.play(2, 0);
-    model1.play(3, 0);
+   model1.play(3, 0);
 
     assertFalse(model1.isGameOver());
     model1.play(0, 0); //5 cards left
@@ -197,7 +275,7 @@ public class WhistModelTest {
     model1.play(0, 0); //3 cards left
     model1.play(1, 0);
     model1.play(2, 0);
-    model1.play(3, 0);
+   model1.play(3, 0);
 
     assertFalse(model1.isGameOver());
     model1.play(0, 0); //2 cards left
@@ -220,23 +298,29 @@ public class WhistModelTest {
     model1.play(2, 0); //1 card left
     assertFalse(model1.isGameOver());
     model1.play(3, 0);
-    assertTrue(model1.isGameOver());
-    //is this hairy, calling play after the game is over?
+    assertFalse(model1.isGameOver());
+      model1.play(0,0);
+      assertFalse(model1.isGameOver());
+      model1.play(1, 0);
+      assertFalse(model1.isGameOver());
+      model1.play(2, 0);
+      assertTrue(model1.isGameOver());
+
     //should throw an exception if you're trying to move once the game is over
     try {
       model1.play(0, 0);
     }
     catch (IllegalArgumentException e) {
       this.playExceptions();
-    }
+   }
 
-    //throws an exception because the game is over
-    try {
+   //throws an exception because the game is over
+   try {
       model1.getCurrentPlayer();
     }
-    catch (IllegalArgumentException e) {
+   catch (IllegalArgumentException e) {
       this.getCurrentPlayerExceptions();
-    }
+      }
   }
 
   @Test
@@ -265,9 +349,8 @@ public class WhistModelTest {
     //H
     shortList.add(new StandardCard(Suit.Clubs, Rank.Ace));
 
-    WhistModel modelSkip = null;
     try {
-      modelSkip = new WhistModel(shortList, 3);
+      this.modelSkip = new WhistModel(shortList, 3);
     } catch (IllegalArgumentException e) {
       modelSkip.play(0, 2);
       modelSkip.play(0, 0);
@@ -291,12 +374,6 @@ public class WhistModelTest {
       modelSkip.play(0, 2);
       assertTrue(modelSkip.isGameOver());
     }
-  }
-
-  @Test
-  public void isGameOver() {
-    //kind of already done in the previous test...... :/
-    //TODO is this okay?
   }
 
 }
