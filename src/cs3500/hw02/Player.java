@@ -70,6 +70,10 @@ public class Player {
     score+=1;
   }
 
+    public int getScore() {
+        return this.score;
+    }
+
 
 }
 
