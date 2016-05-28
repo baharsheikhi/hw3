@@ -56,14 +56,12 @@ public class Player {
   }
 
   private final List<StandardCard> hand;
-  private int score;
 
   /**
    * creates a standard player with an empty list of cards
    */
   public Player() {
     this.hand = new ArrayList<StandardCard>();
-    this.score = 0;
   }
 
   public void updateScore() {

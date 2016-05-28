@@ -15,18 +15,31 @@ import java.util.*;
  */
 public class WhistModelTest {
 
-    List<StandardCard> player1Wins;
-    WhistModel model1;
-    WhistModel modelSkip;
-    WhistModel manyPlayers;
-    WhistModel tie;
-    List<StandardCard> tieDeck;
-    WhistModel gameOverAtStart;
-    WhistModel gameAlmostOverAtStart;
+    private List<StandardCard> player1Wins;
+    private WhistModel model1;
+    private WhistModel modelSkip;
+    private WhistModel manyPlayers;
+    private WhistModel tie;
+    private List<StandardCard> tieDeck;
+    private WhistModel gameOverAtStart;
+    private WhistModel gameAlmostOverAtStart;
+    List<StandardCard> basicDeck;
 
+    /**
+     * Initializes the data of this tester class
+     */
     public void initData() {
         this.player1Wins = new ArrayList<>();
         this.tieDeck = new ArrayList<>();
+
+        List<StandardCard> basicDeck = new ArrayList<StandardCard>();
+
+        for (int i = StandardCard.MIN_RANK_VALUE; i <= StandardCard.MAX_RANK_VALUE; i++) {
+            basicDeck.add(new StandardCard(Suit.Clubs, Rank.intToRank(i)));
+            basicDeck.add(new StandardCard(Suit.Diamonds, Rank.intToRank(i)));
+            basicDeck.add(new StandardCard(Suit.Hearts, Rank.intToRank(i)));
+            basicDeck.add(new StandardCard(Suit.Spades, Rank.intToRank(i)));
+        }
 
         //player 1 should win this round because it has the highest rank
         this.player1Wins.add(new StandardCard(Suit.Clubs, Rank.Ace));
@@ -159,11 +172,17 @@ public class WhistModelTest {
         this.model1 = new WhistModel(this.player1Wins, 4);
         this.manyPlayers = new WhistModel(this.player1Wins, 52);
         this.tie = new WhistModel(this.tieDeck, 13);
-        this.gameOverAtStart = new WhistModel(this.model1.getDeck(), 3);
-        this.gameAlmostOverAtStart = new WhistModel(this.model1.getDeck(), 5);
+        this.gameOverAtStart = new WhistModel(basicDeck, 3);
+        this.gameAlmostOverAtStart = new WhistModel(basicDeck, 5);
     }
 
 
+    /**
+     * Gets the given player's hand given a model
+     * @param playerNo the player to get the hand from
+     * @param model the model to get the player's hand
+     * @return the player's hand
+     */
     private String[] getPlayerHand(int playerNo, WhistModel model) {
         this.initData();
 
@@ -174,6 +193,13 @@ public class WhistModelTest {
         return cardsUntrimmed[1].split(",");
     }
 
+    /**
+     * Gets the given player's score given a model and the number of players
+     * @param playerNo the player to get the score from
+     * @param model the model to get it from
+     * @param modelPlayerSize the number of player's in the model
+     * @return the given player's score
+     */
     private int playerScore(int playerNo, WhistModel model, int modelPlayerSize) {
 
         if (playerNo > modelPlayerSize || playerNo < 1) {
@@ -194,6 +220,12 @@ public class WhistModelTest {
         }
     }
 
+    /**
+     * Gets the winner of the given game
+     * @param model the model
+     * @param modelPlayerSize the number of players
+     * @return the winner
+     */
     private int getWinner(WhistModel model, int modelPlayerSize) {
         if (!model.isGameOver()) {
             throw new IllegalArgumentException("Game is not over and cannot get winner");
@@ -236,64 +268,6 @@ public class WhistModelTest {
         assertEquals(0, this.playerScore(4, manyPlayers, 52));
         assertEquals(1, manyPlayers.getCurrentPlayer());
     }
-
-    public void initModelSkip() {
-        List<StandardCard> shortList = new ArrayList<StandardCard>();
-        //X
-        shortList.add(new StandardCard(Suit.Hearts, Rank.Two));
-        //Y
-        shortList.add(new StandardCard(Suit.Hearts, Rank.Three));
-        //Z
-        shortList.add(new StandardCard(Suit.Hearts, Rank.Five));
-        //A
-        shortList.add(new StandardCard(Suit.Spades, Rank.Two));
-        //B
-        shortList.add(new StandardCard(Suit.Spades, Rank.Three));
-        //C
-        shortList.add(new StandardCard(Suit.Spades, Rank.Five));
-        //D
-        shortList.add(new StandardCard(Suit.Diamonds, Rank.Two));
-        //E
-        shortList.add(new StandardCard(Suit.Diamonds, Rank.Ace));
-        //F
-        shortList.add(new StandardCard(Suit.Diamonds, Rank.Three));
-        //G
-        shortList.add(new StandardCard(Suit.Clubs, Rank.Two));
-        //H
-        shortList.add(new StandardCard(Suit.Clubs, Rank.Ace));
-        this.modelSkip = new WhistModel(shortList, 3);
-    }
-
-//    @Test
-//    public void testSkipPlayerPlay() {
-//        try {
-//            this.initModelSkip();
-//        } catch (IllegalArgumentException e) {
-//            try {
-//                modelSkip.play(0, 2);
-//                modelSkip.play(0, 0);
-//                modelSkip.play(0, 1);
-//                //player 3 should win here
-//                modelSkip.play(0, 2);
-//                modelSkip.play(0, 0);
-//                modelSkip.play(0, 1);
-//                //player 3 should win again
-//                modelSkip.play(0, 2);
-//                modelSkip.play(0, 0);
-//                modelSkip.play(0, 1);
-//                //player 2 should win here
-//                //because player 1 does not have any more cards
-//                modelSkip.play(0, 1);
-//                modelSkip.play(0, 2);
-//                assertTrue(modelSkip.isGameOver());
-//            }
-//            catch (NullPointerException n) {
-//                this.initModelSkip();
-//            }
-//
-//        }
-//    }
-
 
     @Test
     public void simpleGameTest() {
@@ -710,7 +684,7 @@ public class WhistModelTest {
         model1.getCurrentPlayer();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testPlayIsGameOver() {
         this.initData();
 
@@ -720,7 +694,9 @@ public class WhistModelTest {
             }
         }
 
+        assertFalse(this.gameOverAtStart.isGameOver());
         this.gameOverAtStart.play(0, 0);
+        assertTrue(this.gameOverAtStart.isGameOver());
     }
 
     @Test
@@ -794,8 +770,7 @@ public class WhistModelTest {
 
         this.gameAlmostOverAtStart.play(0, 0);
 
-
-        assertTrue(gameAlmostOverAtStart.isGameOver());
+        assertFalse(gameAlmostOverAtStart.isGameOver());
 
         this.gameAlmostOverAtStart.play(1, 0);
         assertEquals("Number of players: 5\n" +
@@ -812,11 +787,5 @@ public class WhistModelTest {
                 "Game over. Player 5 won.", this.gameAlmostOverAtStart.getGameState());
 
     }
-
-
-
-
-
-
 
 }

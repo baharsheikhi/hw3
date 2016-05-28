@@ -31,6 +31,7 @@ public class GenericStandardDeckGame implements GenericCardGameModel<StandardCar
             allCards.add(new StandardCard(Suit.Spades, Rank.intToRank(i)));
         }
 
+        Collections.shuffle(allCards);
         return allCards;
     }
 
@@ -206,7 +207,6 @@ public class GenericStandardDeckGame implements GenericCardGameModel<StandardCar
             throw new IllegalArgumentException("Please enter a valid number of players");
         } else {
             this.deck = this.getDeck();
-            Collections.shuffle(this.deck);
             this.players = new ArrayList<Player>();
             this.startPlay(numPlayers, this.deck);
         }
@@ -217,7 +217,6 @@ public class GenericStandardDeckGame implements GenericCardGameModel<StandardCar
      */
     public GenericStandardDeckGame() {
         this.deck = this.getDeck();
-        Collections.shuffle(this.deck);
         this.players = new ArrayList<Player>();
     }
 
