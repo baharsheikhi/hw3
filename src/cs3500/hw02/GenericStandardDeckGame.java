@@ -5,17 +5,39 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by bahar on 5/16/16. This is a class to represent a generic standard deck game. It is the
- * foundation of card games and is a general model that can be used for many card games.
- *
- * All these games have some common aspects. They can be played by many players, and they use an
- * entire deck of cards. The deck of cards are distributed among all the players, so that each
- * player has a subset of cards at any time in the game. Players give up their cards as the game
+ * Changes made this class as part of homework 3:
+ * Start play was removed from the default constructor to give users
+ * the ability to start the game on demand.
+ * <p>
+ * Created protected getter method: getPlayers() so that the
+ * inherited classes can access the players
+ * <p>
+ * Took out collections.shuffle from the constructor and moved
+ * it into startPlay so that when the game
+ * started, a shuffled deck was distributed among the players
+ * <p>
+ * Fixed a bug with startPlay where it would give an indexOutOfBounds
+ * exception for odd numbers of players
+ */
+
+/**
+ * Created by bahar on 5/16/16. This is a class to represent a
+ * generic standard deck game. It is the
+ * foundation of card games and is a general model that can
+ * be used for many card games.
+ * <p>
+ * All these games have some common aspects.
+ * They can be played by many players, and they use an
+ * entire deck of cards. The deck of cards are distributed
+ * among all the players, so that each
+ * player has a subset of cards at any time in the game.
+ * Players give up their cards as the game
  * progresses, and the game ends when all players have run out of cards.
- *
+ * <p>
  * NOTE: In this standard deck game ace is the highest value
- *
- * The cards it uses is the standard 52-card deck, without jokers. Ranks 2-Ace and Suits Club,
+ * <p>
+ * The cards it uses is the standard 52-card deck, without jokers.
+ * Ranks 2-Ace and Suits Club,
  * Diamonds, Hearts, Spades
  */
 public class GenericStandardDeckGame implements GenericCardGameModel<StandardCard> {
@@ -169,10 +191,14 @@ public class GenericStandardDeckGame implements GenericCardGameModel<StandardCar
                 default:
             }
         }
-        return clubsCount == 13 && diamondsCount == 13 && spadesCount == 13 && heartsCount == 13 &&
-                twoCount == 4 && threeCount == 4 && fourCount == 4 && fiveCount == 4 && sixCount == 4 &&
-                sevenCount == 4 && eightCount == 4 && nineCount == 4 && tenCount == 4 && jackCount == 4
-                && queenCount == 4 && kingCount == 4 && aceCount == 4;
+        return clubsCount == 13 && diamondsCount == 13 && spadesCount == 13
+                && heartsCount == 13 &&
+                twoCount == 4 && threeCount == 4 && fourCount == 4 &&
+                fiveCount == 4 && sixCount == 4 &&
+                sevenCount == 4 && eightCount == 4 && nineCount == 4
+                && tenCount == 4 && jackCount == 4
+                && queenCount == 4 && kingCount == 4
+                && aceCount == 4;
     }
 
     /**
@@ -185,26 +211,18 @@ public class GenericStandardDeckGame implements GenericCardGameModel<StandardCar
     }
 
     /**
-     * Gets the deck of this generic standard deck game
-     *
-     * @return the deck of this game
-     */
-    protected List<StandardCard> getCards() {
-        return this.deck;
-    }
-
-
-    /**
      * creates a generic standard deck game with a given number of players.
      * gets the deck and then shuffles it.
-     * Distributes the cards among the players.
+     * Starts the game; distributes the cards among the players
      *
      * @param numPlayers the number of players in this game
-     *                   throws an illegal argument exception if the number of players is less than 1
+     *                   throws an illegal argument exception
+     *                   if the number of players is less than 1
      */
     public GenericStandardDeckGame(int numPlayers) {
         if (numPlayers < 1) {
-            throw new IllegalArgumentException("Please enter a valid number of players");
+            throw
+                    new IllegalArgumentException("Please enter a valid number of players");
         } else {
             this.deck = this.getDeck();
             this.players = new ArrayList<Player>();
@@ -213,7 +231,10 @@ public class GenericStandardDeckGame implements GenericCardGameModel<StandardCar
     }
 
     /**
-     * creates a generic standard deck game with a shuffled deck and 4 players
+     * Creates a generic standard deck game without
+     * startPlay being called (the game has not yet been started)
+     * There are no players yet.
+     * The deck used in this game must is shuffled and valid.
      */
     public GenericStandardDeckGame() {
         this.deck = this.getDeck();
@@ -221,7 +242,9 @@ public class GenericStandardDeckGame implements GenericCardGameModel<StandardCar
     }
 
     /**
-     * creates a generic standard deck game with the given deck, unshuffled
+     * Creates a generic standard deck game with the given deck, unshuffled
+     * There are 0 players at the start of this game
+     * Throws an illegalargumentException if the deck is not valid
      *
      * @param deck the deck that will be the deck of the game
      */
@@ -231,9 +254,17 @@ public class GenericStandardDeckGame implements GenericCardGameModel<StandardCar
         }
         this.deck = deck;
         this.players = new ArrayList<Player>();
-        this.startPlay(4, deck);
     }
 
+    /**
+     * creates a generic standard deck game with the given deck and number of players
+     * throws an illegalargument exception if the number of players is less than 1
+     * throws an illegalargument exception if the deck is invalid
+     * Distributes the deck among the players in a round-robin way
+     *
+     * @param deck       the deck to play with
+     * @param numPlayers the number of players that are playing
+     */
     public GenericStandardDeckGame(List<StandardCard> deck, int numPlayers) {
         if (numPlayers < 1) {
             throw new IllegalArgumentException("Please enter a valid number of players");
@@ -249,10 +280,5 @@ public class GenericStandardDeckGame implements GenericCardGameModel<StandardCar
 }
 
 
-//changed the constructor so the cards were not dealt upon creation
-//should our tests on genericStandardCardGame be resubmitted?
 
-//changed and took out start play in the constructor
 
-//fixed a bug with startplay
-//default constructor does not start the game

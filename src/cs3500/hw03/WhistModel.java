@@ -2,36 +2,40 @@ package cs3500.hw03;
 
 import java.util.*;
 
-import cs3500.hw02.GenericStandardDeckGame;
-import cs3500.hw02.Player;
-import cs3500.hw02.StandardCard;
-import cs3500.hw02.Suit;
+import cs3500.hw02.*;
 
 /**
  * Created by bahar on 5/23/16.
+ * To represent the model of the whist game.
  */
 public class WhistModel extends GenericStandardDeckGame implements CardGameModel<StandardCard> {
 
     @Override
     public void play(int playerNo, int cardIdx) {
         if (playerNo >= this.getPlayers().size()) {
-            throw new IllegalArgumentException("Please enter a valid player number");
+            throw
+                    new IllegalArgumentException("Please enter a valid player number");
         }
 
         if (cardIdx >= this.getPlayers().get(playerNo).cardCount()) {
-            throw new IllegalArgumentException("Please enter a valid card index");
+            throw
+                    new IllegalArgumentException("Please enter a valid card index");
         }
 
         if (playerNo != this.whoseTurn) {
-            throw new IllegalArgumentException("Not this player's turn to play");
+            throw
+                    new IllegalArgumentException("Not this player's turn to play");
         }
 
         if (this.getPlayers().size() == 0) {
-            throw new IllegalArgumentException("Cannot move before the game has started");
+            throw
+                    new IllegalArgumentException("Cannot move before the game has started");
         }
 
 
-        StandardCard played = this.getPlayers().get(playerNo).removeCard(cardIdx);
+        StandardCard played =
+                this.getPlayers().get(playerNo).removeCard(cardIdx, this.trickSuit);
+
 
         //if its the last play then determine the winner, update the score of the winner
         //and then set whoever's turn it is to the winner
@@ -41,6 +45,7 @@ public class WhistModel extends GenericStandardDeckGame implements CardGameModel
             this.getPlayers().get(currentWinner).updateScore();
             if (this.getPlayers().get(currentWinner).cardCount() != 0) {
                 this.setWhoseTurn(currentWinner);
+                this.isTrickOver = true;
             } else if (!this.isGameOver()) {
                 this.updateTurn();
             }
@@ -49,12 +54,14 @@ public class WhistModel extends GenericStandardDeckGame implements CardGameModel
         //if its the first play then set the suit
         else if (playerNo == this.currentWinner) {
             if (this.isGameOver()) {
-                throw new IllegalArgumentException("Can't move once the game is over");
+                throw new
+                        IllegalArgumentException("Can't move once the game is over");
             }
             this.setTrickSuit(Suit.getSuit(played.toString()), playerNo);
             this.cardsInPlay = new HashMap<StandardCard, Integer>();
             cardsInPlay.put(played, playerNo);
             this.updateTurn();
+            this.isTrickOver = false;
 
         } else {
             cardsInPlay.put(played, playerNo);
@@ -66,10 +73,12 @@ public class WhistModel extends GenericStandardDeckGame implements CardGameModel
     @Override
     public int getCurrentPlayer() {
         if (this.getPlayers().size() == 0) {
-            throw new IllegalArgumentException("The game has not started yet");
+            throw new
+                    IllegalArgumentException("The game has not started yet");
         }
         if (this.isGameOver()) {
-            throw new IllegalArgumentException("The game is over and cannot get the current player");
+            throw new
+                    IllegalArgumentException("The game is over and cannot get the current player");
         }
         return this.whoseTurn;
     }
@@ -85,8 +94,7 @@ public class WhistModel extends GenericStandardDeckGame implements CardGameModel
                 countHasCards += 1;
             }
         }
-        return (countHasCards < 2) && (this.whoseTurn == (Math.floorMod(this.currentWinner - 1,
-                this.getPlayers().size())));
+        return (countHasCards < 2) && (this.isTrickOver == true);
     }
 
     @Override
@@ -134,6 +142,7 @@ public class WhistModel extends GenericStandardDeckGame implements CardGameModel
         this.currentWinner = 0;
         this.trickSuit = null;
         this.cardsInPlay = new HashMap<StandardCard, Integer>();
+        this.isTrickOver = false;
     }
 
     /**
@@ -152,6 +161,7 @@ public class WhistModel extends GenericStandardDeckGame implements CardGameModel
         this.currentWinner = 0;
         this.trickSuit = null;
         this.cardsInPlay = new HashMap<StandardCard, Integer>();
+        this.isTrickOver = false;
     }
 
     /**
@@ -169,12 +179,32 @@ public class WhistModel extends GenericStandardDeckGame implements CardGameModel
         this.currentWinner = 0;
         this.trickSuit = null;
         this.cardsInPlay = new HashMap<StandardCard, Integer>();
+        this.isTrickOver = false;
+    }
+
+    /**
+     * Creates a WhistModel with a custom deck and a custom
+     * number of players.
+     * It is the first player's turn.
+     * There is no suit of the first trick.
+     * The game is already started when this constructor is called.
+     *
+     * @param deck the custom deck
+     */
+    public WhistModel(List<StandardCard> deck) {
+        super(deck);
+        this.whoseTurn = 0;
+        this.currentWinner = 0;
+        this.trickSuit = null;
+        this.cardsInPlay = new HashMap<StandardCard, Integer>();
+        this.isTrickOver = false;
     }
 
     private int whoseTurn;
     private Suit trickSuit;
     private int currentWinner;
     private HashMap<StandardCard, Integer> cardsInPlay;
+    private boolean isTrickOver;
 
 
     /**
@@ -207,7 +237,8 @@ public class WhistModel extends GenericStandardDeckGame implements CardGameModel
     }
 
     /**
-     * Increments the turn of the player it is; wraps around to the 0th player
+     * Increments the turn of the player it is;
+     * wraps around to the 0th player
      * if it reaches the highest player
      */
     private void incrementWhoseTurn() {
@@ -220,16 +251,23 @@ public class WhistModel extends GenericStandardDeckGame implements CardGameModel
     }
 
     /**
-     * update's the turn appropriately, taking into consideration if the next player's has cards.
-     * This method stops updating the turns when it reaches the last player of a trick.
+     * update's the turn appropriately, taking into
+     * consideration if the next player's has cards.
+     * This method stops updating the turns when it
+     * reaches the last player of a trick.
      */
     private void updateTurn() {
-
-        if (this.getPlayers().get(Math.floorMod((whoseTurn + 1), this.getPlayers().size())).cardCount() != 0) {
+        if (this.whoseTurn == this.currentWinner) {
+            this.isTrickOver = false;
+        }
+        if (this.getPlayers().get(Math.floorMod((whoseTurn + 1),
+                this.getPlayers().size())).cardCount() != 0) {
             this.incrementWhoseTurn();
         } else {
             this.incrementWhoseTurn();
-            if (this.whoseTurn == (Math.floorMod(this.currentWinner - 1, this.getPlayers().size()))) {
+            if (this.whoseTurn == (Math.floorMod(this.currentWinner - 1,
+                    this.getPlayers().size()))) {
+                this.isTrickOver = true;
             } else {
                 this.updateTurn();
             }
@@ -286,7 +324,9 @@ public class WhistModel extends GenericStandardDeckGame implements CardGameModel
      */
     private void setTrickSuit(Suit s, int player) {
         if (player != this.currentWinner) {
-            throw new IllegalArgumentException("Only the first player of this trick can set the suit");
+            throw
+                    new IllegalArgumentException
+                            ("Only the first player of this trick can set the suit");
         }
         this.trickSuit = s;
     }
@@ -306,29 +346,5 @@ public class WhistModel extends GenericStandardDeckGame implements CardGameModel
 }
 
 
-// start playing with at least two players
 
-
-//technically better to extend, now change the model, better avoiding casting
-//protected method where you are creating players objects and then in the whist model override so that instead of
-//creating player objects it creates whistplayer object, only the model class knows what is in the player is whistplayer
-//has all the methods and functionality of a regular player....this is the normal way
-//getter and a setter? for this problem and make this protected so model can access it
-
-
-//WHAT HAS CHANGED:
-//I MADE GETTER AND SETTER METHODS IN THE GENERICSTANDARDCARDGAME class
-
-//TODO make it so that start play isnt called in the constructor
-
-//TODO isGameOVer exception and play exception
-
-//the game cannot end in the middle of a trick
-//all changes -- I changed the player class and added two methods remove() and add()
-//write in comments that changes
-
-//if it is the first player, then the trick becomes what they put down
-//if this player is the
-
-//change added getSuit in teh suit class
 

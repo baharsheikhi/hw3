@@ -32,7 +32,7 @@ public class WhistModelTest {
         this.player1Wins = new ArrayList<>();
         this.tieDeck = new ArrayList<>();
 
-        List<StandardCard> basicDeck = new ArrayList<StandardCard>();
+        this.basicDeck = new ArrayList<StandardCard>();
 
         for (int i = StandardCard.MIN_RANK_VALUE; i <= StandardCard.MAX_RANK_VALUE; i++) {
             basicDeck.add(new StandardCard(Suit.Clubs, Rank.intToRank(i)));
@@ -172,15 +172,16 @@ public class WhistModelTest {
         this.model1 = new WhistModel(this.player1Wins, 4);
         this.manyPlayers = new WhistModel(this.player1Wins, 52);
         this.tie = new WhistModel(this.tieDeck, 13);
-        this.gameOverAtStart = new WhistModel(basicDeck, 3);
-        this.gameAlmostOverAtStart = new WhistModel(basicDeck, 5);
+        this.gameOverAtStart = new WhistModel(this.basicDeck, 3);
+        this.gameAlmostOverAtStart = new WhistModel(this.basicDeck, 5);
     }
 
 
     /**
      * Gets the given player's hand given a model
+     *
      * @param playerNo the player to get the hand from
-     * @param model the model to get the player's hand
+     * @param model    the model to get the player's hand
      * @return the player's hand
      */
     private String[] getPlayerHand(int playerNo, WhistModel model) {
@@ -195,8 +196,9 @@ public class WhistModelTest {
 
     /**
      * Gets the given player's score given a model and the number of players
-     * @param playerNo the player to get the score from
-     * @param model the model to get it from
+     *
+     * @param playerNo        the player to get the score from
+     * @param model           the model to get it from
      * @param modelPlayerSize the number of player's in the model
      * @return the given player's score
      */
@@ -214,7 +216,8 @@ public class WhistModelTest {
         String score = scoreAsArray[1];
 
         if (score.charAt(2) != '\n') {
-            return Integer.parseInt(Character.toString(score.charAt(1)) + Character.toString(score.charAt(2)));
+            return Integer.parseInt(Character.toString(score.charAt(1))
+                    + Character.toString(score.charAt(2)));
         } else {
             return Integer.parseInt(Character.toString(score.charAt(1)));
         }
@@ -222,7 +225,8 @@ public class WhistModelTest {
 
     /**
      * Gets the winner of the given game
-     * @param model the model
+     *
+     * @param model           the model
      * @param modelPlayerSize the number of players
      * @return the winner
      */
@@ -417,7 +421,7 @@ public class WhistModelTest {
         model1.play(1, 0);
         assertFalse(model1.isGameOver());
         model1.play(2, 0);
-        assertTrue(model1.isGameOver());
+        assertFalse(model1.isGameOver());
         model1.play(3, 0);
         assertTrue(model1.isGameOver());
         assertEquals(1, this.getWinner(model1, 4));
@@ -519,6 +523,19 @@ public class WhistModelTest {
                 "Player 3: \n" +
                 "Player 4: 2♠\n" +
                 "Player 1 score: 12\n" +
+                "Player 2 score: 0\n" +
+                "Player 3 score: 0\n" +
+                "Player 4 score: 0\n" +
+                "Turn: Player 4", this.model1.getGameState());
+
+        model1.play(3, 0);
+
+        assertEquals("Number of players: 4\n" +
+                "Player 1: \n" +
+                "Player 2: \n" +
+                "Player 3: \n" +
+                "Player 4: \n" +
+                "Player 1 score: 13\n" +
                 "Player 2 score: 0\n" +
                 "Player 3 score: 0\n" +
                 "Player 4 score: 0\n" +
@@ -664,7 +681,7 @@ public class WhistModelTest {
     @Test(expected = IllegalArgumentException.class)
     public void testPlayBeforePlayingException() {
         model1 = new WhistModel();
-        model1.isGameOver();
+        model1.play(0, 0);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -674,6 +691,7 @@ public class WhistModelTest {
             manyPlayers.play(i, 0);
         }
 
+       assertTrue(this.manyPlayers.isGameOver());
         manyPlayers.getCurrentPlayer();
 
     }
@@ -684,7 +702,7 @@ public class WhistModelTest {
         model1.getCurrentPlayer();
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testPlayIsGameOver() {
         this.initData();
 
@@ -694,11 +712,11 @@ public class WhistModelTest {
             }
         }
 
-        assertFalse(this.gameOverAtStart.isGameOver());
-        this.gameOverAtStart.play(0, 0);
         assertTrue(this.gameOverAtStart.isGameOver());
+        this.gameOverAtStart.play(0, 0);
     }
 
+    //FIXME
     @Test
     public void testPlayGameIsntOver() {
         this.initData();
@@ -715,6 +733,7 @@ public class WhistModelTest {
         this.gameAlmostOverAtStart.play(1, 0);
         this.gameAlmostOverAtStart.play(2, 0);
         this.gameAlmostOverAtStart.play(3, 0);
+
 
         this.gameAlmostOverAtStart.play(4, 0);
         this.gameAlmostOverAtStart.play(0, 0);
@@ -769,10 +788,10 @@ public class WhistModelTest {
         assertEquals(0, this.gameAlmostOverAtStart.getCurrentPlayer());
 
         this.gameAlmostOverAtStart.play(0, 0);
-
         assertFalse(gameAlmostOverAtStart.isGameOver());
 
         this.gameAlmostOverAtStart.play(1, 0);
+
         assertEquals("Number of players: 5\n" +
                 "Player 1: \n" +
                 "Player 2: \n" +
@@ -786,6 +805,18 @@ public class WhistModelTest {
                 "Player 5 score: 10\n" +
                 "Game over. Player 5 won.", this.gameAlmostOverAtStart.getGameState());
 
+    }
+
+    @Test
+    public void bigTest() {
+        this.initData();
+        WhistModel modelBig = new WhistModel(53);
+
+        for (int i = 0; i < 51; i++) {
+            modelBig.play(i, 0);
+        }
+        modelBig.play(51, 0);
+        assertTrue(modelBig.isGameOver());
     }
 
 }
